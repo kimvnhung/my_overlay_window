@@ -8,5 +8,6 @@ final public class OverlayConstants {
     static final String MESSENGER_TAG = "x-slayer/overlay_messenger";
     static final String CHANNEL_ID = "Overlay Channel";
     static final int NOTIFICATION_ID = 4579;
+    static final String OVERLAY_RECEIVER = "com.prioso.my_overlay_window.overlay_receiver";
 }
 

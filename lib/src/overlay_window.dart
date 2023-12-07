@@ -81,6 +81,27 @@ class MyOverlayWindow {
     return _res;
   }
 
+  static Future shareMessage(String receiver, String message) async {
+    try {
+      log("shareMessage");
+      return await _overlayChannel.invokeMethod(
+        "shareMessage",
+        {"receiver": receiver, "message": message},
+      );
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  static Future registerCallMethod(
+      Future<dynamic> Function(MethodCall call)? handler) async {
+    try {
+      _overlayChannel.setMethodCallHandler(handler);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
   /// Broadcast data to and from overlay app
   static Future shareData(dynamic data) async {
     return await _overlayMessageChannel.send(data);
