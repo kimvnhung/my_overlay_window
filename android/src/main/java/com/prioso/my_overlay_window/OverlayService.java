@@ -3,9 +3,11 @@ package com.prioso.my_overlay_window;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -41,6 +43,7 @@ import io.flutter.plugin.common.JSONMessageCodec;
 import io.flutter.plugin.common.MethodChannel;
 
 public class OverlayService extends Service implements View.OnTouchListener {
+    private static final String TAG = OverlayService.class.getName();
     private final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;
     private final int DEFAULT_STATUS_BAR_HEIGHT_DP = 25;
 
@@ -164,7 +167,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
         return START_STICKY;
     }
 
-    class OverlayReceiver extends BroadcastReceiver {
+    class OverlayReceiver extends BroadcastReceiver implements MethodChannel.Result{
     
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -174,9 +177,9 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 switch (intent.getAction()) {
                     case OverlayConstants.OVERLAY_RECEIVER:
                         String mess = intent.getStringExtra("message");
-                        Utils.d(TAG, "onReceive: "+mess,OverlayService.this);
+                        Log.d(TAG, "onReceive: "+mess);
                         if(flutterChannel != null){
-                            flutterChannel.invokeMethod("received_message",mess,MainActivity.this);
+                            flutterChannel.invokeMethod("received_message",mess,this);
                         }
                         break;
                     default:
@@ -184,6 +187,16 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 }
             }
         }
+
+        @Override
+        public void success(Object o) {
+        }
+      
+        @Override
+        public void error(String s, String s1, Object o) {}
+      
+        @Override
+        public void notImplemented() {}
     }
 
     void sendMessage(String receiver,String message) {
