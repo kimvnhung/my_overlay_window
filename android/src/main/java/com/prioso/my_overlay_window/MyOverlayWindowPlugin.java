@@ -58,7 +58,6 @@ public class MyOverlayWindowPlugin implements
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         pendingResult = result;
-        Log.d("MyOverlayWindowPlugin",call.method);
         if (call.method.equals("checkPermission")) {
             result.success(checkOverlayPermission());
         } else if (call.method.equals("requestPermission")) {
