@@ -79,6 +79,8 @@ public class OverlayService extends Service implements View.OnTouchListener {
         isRunning = false;
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(OverlayConstants.NOTIFICATION_ID);
+        unregisterReceiver(this.dataReceiver);
+        this.dataReceiver = null;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -113,6 +115,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
         flutterView.setFocusableInTouchMode(true);
         flutterView.setBackgroundColor(Color.TRANSPARENT);
         flutterChannel.setMethodCallHandler((call, result) -> {
+            Log.d("OverlayService",call.method);
             if (call.method.equals("updateFlag")) {
                 String flag = call.argument("flag").toString();
                 updateOverlayFlag(result, flag);
@@ -120,6 +123,10 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 int width = call.argument("width");
                 int height = call.argument("height");
                 resizeOverlay(width, height, result);
+            } else if(call.method.equals("shareMessage")){
+                String receiver = call.argument("receiver");
+                String message = call.argument("message");
+                sendMessage(receiver,message);
             }
         });
         overlayMessageChannel.setMessageHandler((message, reply) -> {
@@ -155,6 +162,34 @@ public class OverlayService extends Service implements View.OnTouchListener {
         flutterView.setOnTouchListener(this);
         windowManager.addView(flutterView, params);
         return START_STICKY;
+    }
+
+    class OverlayReceiver extends BroadcastReceiver {
+    
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null) {
+                // Utils.d(TAG, intent.getAction(),MainActivity.this);
+    
+                switch (intent.getAction()) {
+                    case OverlayConstants.OVERLAY_RECEIVER:
+                        String mess = intent.getStringExtra("message");
+                        Utils.d(TAG, "onReceive: "+mess,OverlayService.this);
+                        if(flutterChannel != null){
+                            flutterChannel.invokeMethod("received_message",mess,MainActivity.this);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    void sendMessage(String receiver,String message) {
+        Intent intent = new Intent(receiver);
+        intent.putExtra("message", message);
+        sendBroadcast(intent);
     }
 
 
@@ -230,6 +265,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
     }
 
 
+    OverlayReceiver dataReceiver = new OverlayReceiver();
     @Override
     public void onCreate() {
         createNotificationChannel();
@@ -251,6 +287,10 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 .setVisibility(WindowSetup.notificationVisibility)
                 .build();
         startForeground(OverlayConstants.NOTIFICATION_ID, notification);
+
+        //register 
+        IntentFilter intentFilter = new IntentFilter(OverlayConstants.OVERLAY_RECEIVER);
+        registerReceiver(this.dataReceiver,intentFilter);
     }
 
     private void createNotificationChannel() {

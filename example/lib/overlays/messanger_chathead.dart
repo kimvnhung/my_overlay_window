@@ -83,6 +83,7 @@ class _MessangerChatHeadState extends State<MessangerChatHead> {
                               _kPortNameHome,
                             );
                             homePort?.send('Date: ${DateTime.now()}');
+                            MyOverlayWindow.shareMessage("hello");
                           },
                           child: const Text("Send message to UI"),
                         ),
