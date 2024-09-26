@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_overlay_window_example/home_page.dart';
 import 'package:my_overlay_window_example/overlays/messanger_chathead.dart';
-import 'package:my_overlay_window_example/overlays/true_caller_overlay.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

@@ -77,8 +77,8 @@ class MyOverlayWindow {
 
   /// Closes overlay if open
   static Future<bool?> closeOverlay() async {
-    final bool? _res = await _channel.invokeMethod('closeOverlay');
-    return _res;
+    final bool? res = await _channel.invokeMethod('closeOverlay');
+    return res;
   }
 
   static Future shareMessage(String receiver, String message) async {
@@ -118,27 +118,27 @@ class MyOverlayWindow {
 
   /// Update the overlay flag while the overlay in action
   static Future<bool?> updateFlag(OverlayFlag flag) async {
-    final bool? _res = await _overlayChannel
+    final bool? res = await _overlayChannel
         .invokeMethod<bool?>('updateFlag', {'flag': flag.name});
-    return _res;
+    return res;
   }
 
   /// Update the overlay size in the screen
   static Future<bool?> resizeOverlay(int width, int height) async {
-    final bool? _res = await _overlayChannel.invokeMethod<bool?>(
+    final bool? res = await _overlayChannel.invokeMethod<bool?>(
       'resizeOverlay',
       {
         'width': width,
         'height': height,
       },
     );
-    return _res;
+    return res;
   }
 
   /// Check if the current overlay is active
   static Future<bool> isActive() async {
-    final bool? _res = await _channel.invokeMethod<bool?>('isOverlayActive');
-    return _res ?? false;
+    final bool? res = await _channel.invokeMethod<bool?>('isOverlayActive');
+    return res ?? false;
   }
 
   /// Dispose overlay stream
